@@ -20,7 +20,9 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const L = (k) => t(lang, k);
 
-  useEffect(() => window.scrollTo({ top: 0, behavior: 'smooth' }), [step]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [step]);
   const flash = (msg) => {
     setToast(msg);
     setTimeout(() => setToast(null), 2600);
