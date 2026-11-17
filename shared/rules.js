@@ -16,6 +16,8 @@ export function enforceRules({ result, extracted, home, summaryText }) {
 
   for (const it of items) {
     if (!STATUSES.includes(it.status)) it.status = 'ASK_DOCTOR';
+    it.display_name = String(it.display_name || it.salt || 'Medicine').replace(/^(tab|tablet|cap|capsule|inj)\.?\s+/i, '').trim();
+    if (it.strength && !/\d/.test(it.display_name)) it.display_name = `${it.display_name} ${it.strength}`;
     it.rule_notes = [];
 
     // Rule 1: STOP only when the summary explicitly stops it.

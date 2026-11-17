@@ -240,6 +240,9 @@ function HomeStep({ L, home, setHome, onBack, onNext }) {
           <p className="fineprint left">{L('noHome')}</p>
         </>
       )}
+      {home.length > 0 && (
+        <div className="medhead"><span /><span>{L('medCol')}</span><span>{L('doseCol')}</span><span>{L('stockCol')}</span><span /></div>
+      )}
       <ul className="medlist">
         {home.map((h, i) => (
           <li key={i} className="medrow">
@@ -294,6 +297,7 @@ function Processing({ L, done, error, isSample, onRetry, onCached, onBack, onFin
           ))}
         </ul>
       )}
+      {!error && <p className="fineprint left">{L('waitHint')}</p>}
       {error && (
         <div className="errorbox">
           <b>{L('failTitle')}</b>
@@ -463,7 +467,7 @@ function CartStep({ L, lang, result, preferGeneric, setPreferGeneric, slot, setS
               {l.buy != null && (
                 <small className="calc">
                   {L('need')} {l.need} {L('tabs')}{l.have ? ` − ${L('have')} ${l.have}` : ''} = {L('buy')} {l.buy}
-                  {l.chosen ? ` → ${l.strips} ${L('strips')} × ${l.chosen.pack_size}` : ''}
+                  {l.chosen ? ` → ${l.strips} ${l.strips > 1 ? L('stripsP') : L('strips')} × ${l.chosen.pack_size}` : ''}
                 </small>
               )}
               {l.note && <small className="warnnote">{l.note}</small>}
@@ -542,7 +546,7 @@ function DoneStep({ L, lang, result, orderId, slot, consultBooked, onReset }) {
       {stops.length > 0 && (
         <>
           <h3>{L('removeBox')}</h3>
-          <ul className="plainlist stoplist">{stops.map((s, i) => <li key={i}>✕ {s.display_name}</li>)}</ul>
+          <ul className="plainlist stoplist">{stops.map((s, i) => <li key={i}>✕ {(s.home_entry || s.display_name).split(' · ')[0]}</li>)}</ul>
         </>
       )}
       {holds.length > 0 && (

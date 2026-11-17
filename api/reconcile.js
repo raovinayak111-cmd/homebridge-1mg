@@ -38,6 +38,8 @@ For EVERY medicine in DISCHARGE or HOME return exactly one item with one status:
 - POSSIBLE_DUPLICATE: a home medicine with a DIFFERENT salt but the SAME drug_class as a discharge medicine, when the summary does not explicitly stop it.
 - ASK_DOCTOR: a home medicine not mentioned in the summary at all, or anything unclear.
 Hard rules: STOP only if explicitly stopped. A home medicine absent from the summary is ASK_DOCTOR (or POSSIBLE_DUPLICATE per the rule above). Never invent doses, durations or tests: use null. Copy source_quote verbatim from the summary; for home-only items use "Home list: <brand> · <dose>".
+red_flags_hi and diet_activity_hi must be faithful Hindi translations of RED_FLAGS and DIET_ACTIVITY, same items in the same order, adding nothing.
+display_name: the medicine name and strength without "Tab"/"Cap" prefixes (e.g. "Telmisartan 40 mg"); for home-only items use the home brand (e.g. "Losar 50").
 Write reasons for a worried family member: plain words, under 40 words, no jargon. reason_hi must be simple Hindi in Devanagari (medicine names may stay in English).
 For POSSIBLE_DUPLICATE and ASK_DOCTOR write doctor_question (under 40 words, names the medicine and the reason) and doctor_question_hi.
 Return ONLY JSON:
@@ -49,7 +51,12 @@ async function callGemini({ system, parts }) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw Object.assign(new Error('GEMINI_API_KEY is not set on the server.'), { code: 'NO_KEY' });
   let lastErr;
-  for (const model of MODELS) {
+  const attempts = MODELS.flatMap((model) => [
+    { model, thinking: { thinkingLevel: 'low' } },
+    { model, thinking: { thinkingBudget: 0 } },
+    { model, thinking: null },
+  ]);
+  for (const { model, thinking } of attempts) {
     try {
       const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
         method: 'POST',
@@ -57,12 +64,13 @@ async function callGemini({ system, parts }) {
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: system }] },
           contents: [{ role: 'user', parts }],
-          generationConfig: { temperature: 0, responseMimeType: 'application/json' },
+          generationConfig: { temperature: 0, responseMimeType: 'application/json', ...(thinking ? { thinkingConfig: thinking } : {}) },
         }),
       });
       if (!r.ok) {
         const t = await r.text();
         lastErr = new Error(`Gemini ${model} ${r.status}: ${t.slice(0, 200)}`);
+        if (r.status === 400 && thinking) continue; // model may not support this thinking setting
         if ([400, 404, 429, 500, 503].includes(r.status)) continue;
         throw lastErr;
       }

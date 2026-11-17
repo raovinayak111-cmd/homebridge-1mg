@@ -95,6 +95,7 @@ h3 { font-size: 15px; margin: 14px 0 0; }
 .navrow .btn { flex: 1; }
 .navrow.sticky { position: sticky; bottom: 0; background: linear-gradient(transparent, #fafbfc 30%); padding: 18px 0 8px; }
 
+.medhead { display: grid; grid-template-columns: 26px 1fr 70px 56px 26px; gap: 6px; padding: 0 8px; font-size: 11px; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.03em; }
 .medlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .medrow { display: grid; grid-template-columns: 26px 1fr 70px 56px 26px; gap: 6px; align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 6px 8px; }
 .medrow input { border: 1px solid transparent; border-radius: 8px; padding: 6px; width: 100%; min-width: 0; background: transparent; }
