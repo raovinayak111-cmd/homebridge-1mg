@@ -1,0 +1,5 @@
+{
+  "functions": {
+    "api/reconcile.js": { "maxDuration": 60 }
+  }
+}
