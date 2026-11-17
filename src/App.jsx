@@ -8,7 +8,24 @@ import { STATUS_META, buildCart, buildSchedule, addDays, fmtDate, isOnHold } fro
 const FLOW = ['summary', 'home', 'processing', 'plan', 'clarify', 'cart', 'done'];
 const DOTS = ['summary', 'home', 'plan', 'clarify', 'cart', 'done'];
 const STATUS_ICON = { POSSIBLE_DUPLICATE: 'alert', ASK_DOCTOR: 'question', STOP: 'x', DOSE_CHANGED: 'dose', NEW: 'plus', CONTINUE: 'same' };
-const PILL_COLORS = ['#0B6E64', '#C2410C', '#4338CA', '#B45309', '#BE185D', '#0369A1', '#4D7C0F', '#7C3AED', '#A16207', '#0F766E'];
+const PILL_COLORS = ['#0B6E64', '#C2410C', '#4338CA', '#BE185D', '#0369A1', '#65A30D', '#7C3AED', '#B45309', '#0891B2', '#9F1239'];
+
+// "Tab Metformin 1000 mg · 1-0-1" -> { name: 'Metformin 1000 mg', dose: '1-0-1' }
+function splitEntry(s) {
+  if (!s) return null;
+  const parts = String(s).split(/\s*·\s*/);
+  let name = parts[0].replace(/^(tab|tablet|cap|capsule|inj)\.?\s+/i, '');
+  let dose = parts[1] || (name.match(/\b\d(?:\.\d)?-\d(?:\.\d)?-\d(?:\.\d)?\b/) || [])[0] || '';
+  if (dose) name = name.replace(dose, '').trim();
+  name = name.replace(/\s+(x\s*\d+\s*days?|after .*|before .*|bedtime.*|morning.*|continue.*)$/i, '').trim();
+  return { name, dose };
+}
+function Entry({ value, empty, override }) {
+  if (override) return <span className="entry"><b>{override}</b></span>;
+  const e = splitEntry(value);
+  if (!e) return <span className="entry nil">{empty}</span>;
+  return <span className="entry"><b>{e.name}</b>{e.dose && <em>{e.dose}</em>}</span>;
+}
 
 export default function App() {
   const [step, setStep] = useState('landing');
@@ -474,9 +491,9 @@ function MedCard({ it, L, lang, colorOf, prominent }) {
       </header>
       <p className="med-reason">{reason}</p>
       <div className="delta">
-        <div className={it.home_entry ? '' : 'nil'}><small>{L('before')}</small><span>{it.home_entry || L('notAtHome')}</span></div>
+        <div><small>{L('before')}</small><Entry value={it.home_entry} empty={L('notAtHome')} /></div>
         <Icon name="chevron" size={16} className="delta-arrow" />
-        <div className={it.discharge_entry || it.status === 'STOP' ? '' : 'nil'}><small>{L('now')}</small><span>{it.status === 'STOP' ? m[lang] : it.discharge_entry || L('notListed')}</span></div>
+        <div><small>{L('now')}</small><Entry value={it.discharge_entry} empty={L('notListed')} override={it.status === 'STOP' ? m[lang] : null} /></div>
       </div>
       <button className="source-toggle" onClick={() => setOpen(!open)} aria-expanded={open}>
         <Icon name={open ? 'chevdown' : 'chevron'} size={14} />{open ? L('hideSource') : L('showSource')}
@@ -513,7 +530,7 @@ function PlanStep({ L, lang, result, colorOf, onClarify, onCart }) {
         </span>
       </div>
       <p className="sub">
-        {result.patient_label || 'Patient'}. {L('dischargedOn')} {fmtDate(result.discharge_date, lang)}{result.hospital ? `, ${titleCase(result.hospital)}` : ''}.
+        {(result.patient_label || 'Patient').replace(/\.+$/, '')}. {L('dischargedOn')} {fmtDate(result.discharge_date, lang)}{result.hospital ? `, ${titleCase(result.hospital)}` : ''}.
       </p>
 
       <div className="ledger">
@@ -714,7 +731,7 @@ function DoneStep({ L, lang, result, colorOf, orderId, slot, consultBooked, onRe
   const compartments = [['morning', 'sunrise', L('morningS')], ['afternoon', 'sun', L('noonS')], ['night', 'moon', L('nightS')]];
 
   return (
-    <section className="screen done">
+    <section className="screen finale">
       <div className="confirm">
         <span className="confirm-ico"><Icon name="check" size={26} stroke={2.6} /></span>
         <div>

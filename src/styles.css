@@ -289,7 +289,7 @@ a { color: var(--teal); }
 .strip-name:focus { outline: none; border-color: var(--teal); background: var(--sage-2); }
 .icon-btn { width: 32px; height: 32px; border-radius: 9px; border: 0; background: none; color: var(--ink-3); display: grid; place-items: center; }
 .icon-btn:hover { background: var(--danger-l); color: var(--danger); }
-.strip-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; padding-left: 38px; }
+.strip-bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .dose-toggles { display: flex; gap: 4px; }
 .dose-toggles button {
   display: inline-flex; align-items: center; gap: 4px;
@@ -384,8 +384,10 @@ a { color: var(--teal); }
   padding: 10px 12px; border-radius: var(--r-md); background: var(--sage-2); border: 1px solid var(--line-2);
 }
 .delta small { display: block; font-size: 12px; color: var(--ink-3); }
-.delta span { display: block; font-size: 13.5px; font-weight: 600; line-height: 1.35; }
-.delta .nil span { color: var(--ink-3); font-weight: 400; font-style: italic; }
+.entry { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; line-height: 1.3; }
+.entry b { font-size: 13.5px; font-weight: 600; }
+.entry em { font-style: normal; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--teal-d); background: var(--teal-l); border-radius: 6px; padding: 1px 6px; }
+.entry.nil { color: var(--ink-3); font-size: 13.5px; font-style: italic; }
 .delta-arrow { color: var(--ink-3); }
 .source-toggle {
   display: flex; align-items: center; gap: 6px; width: 100%;
@@ -477,7 +479,7 @@ a { color: var(--teal); }
 .pay-total b { font-size: 20px; font-variant-numeric: tabular-nums; }
 
 /* ---------- done ---------- */
-.done { padding-bottom: 24px; }
+.finale { padding-bottom: 24px; }
 .confirm { display: flex; align-items: center; gap: 14px; }
 .confirm-ico { width: 54px; height: 54px; border-radius: 18px; display: grid; place-items: center; background: var(--teal); color: #fff; flex: none; animation: pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
 @keyframes pop { from { transform: scale(0.6); opacity: 0; } to { transform: none; opacity: 1; } }
